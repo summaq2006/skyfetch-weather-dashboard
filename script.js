@@ -17,6 +17,8 @@ axios.get(url)
     // Step 6: Update HTML elements
     document.getElementById("city").textContent = data.name;
 
+    document.title = data.name + " Weather | SkyFetch";
+
     document.getElementById("temperature").textContent =
         "Temperature: " + data.main.temp + "°C";
 
