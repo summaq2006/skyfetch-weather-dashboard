@@ -1,35 +1,58 @@
-// Step 1: Add your API key
 const apiKey = "f05d8429dd24ad17444fb58b8877908c";
 
-// Step 2: Choose a city
-const city = "London";
+const cityInput = document.getElementById("cityInput");
+const searchBtn = document.getElementById("searchBtn");
 
-// Step 3: Create API URL
-const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
+const cityElement = document.getElementById("city");
+const tempElement = document.getElementById("temperature");
+const descElement = document.getElementById("description");
+const iconElement = document.getElementById("icon");
+const errorElement = document.getElementById("error");
+const loadingElement = document.getElementById("loading");
 
-// Step 4: Fetch weather data
-axios.get(url)
-.then(function(response) {
+async function fetchWeather(city) {
+    try {
+        loadingElement.style.display = "block";
+        errorElement.innerText = "";
 
-    // Step 5: Get data from response
-    const data = response.data;
+        const response = await axios.get(
+            `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`
+        );
 
-    // Step 6: Update HTML elements
-    document.getElementById("city").textContent = data.name;
+        const data = response.data;
 
-    document.title = data.name + " Weather | SkyFetch";
+        cityElement.innerText = data.name;
+        document.title = data.name + " Weather | SkyFetch";
 
-    document.getElementById("temperature").textContent =
-        "Temperature: " + data.main.temp + "°C";
+        tempElement.innerText = "Temperature: " + data.main.temp + "°C";
 
-    document.getElementById("description").textContent =
-        data.weather[0].description;
+        const description =
+            data.weather[0].description.charAt(0).toUpperCase() +
+            data.weather[0].description.slice(1);
 
-    const iconCode = data.weather[0].icon;
+        descElement.innerText = description;
 
-    document.getElementById("icon").src =
-        `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
-})
-.catch(function(error) {
-    console.log("Error:", error);
+        iconElement.src =
+            `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
+
+    } catch (error) {
+        errorElement.innerText = "City not found. Please enter a valid city name.";
+        cityElement.innerText = "";
+        tempElement.innerText = "";
+        descElement.innerText = "";
+        iconElement.src = "";
+    } finally {
+        loadingElement.style.display = "none";
+    }
+}
+
+searchBtn.addEventListener("click", function () {
+    const city = cityInput.value.trim();
+
+    if (city === "") {
+        errorElement.innerText = "Please enter a city name.";
+        return;
+    }
+
+    fetchWeather(city);
 });
