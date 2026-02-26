@@ -12,3 +12,37 @@ body {
     border-radius: 10px;
     display: inline-block;
 }
+
+.search-box {
+    margin-bottom: 15px;
+}
+
+input {
+    padding: 8px;
+    width: 65%;
+}
+
+button {
+    padding: 8px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #eee;
+}
+
+.forecast-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.forecast-card {
+    background: white;
+    padding: 10px;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    color: black;   /* ADD THIS */
+}

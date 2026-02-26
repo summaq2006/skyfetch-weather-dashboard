@@ -1,33 +1,93 @@
-// Step 1: Add your API key
-const apiKey = "f05d8429dd24ad17444fb58b8877908c";
+function WeatherApp(apiKey) {
+    this.apiKey = apiKey;
 
-// Step 2: Choose a city
-const city = "London";
+    this.cityInput = document.getElementById("cityInput");
+    this.searchBtn = document.getElementById("searchBtn");
 
-// Step 3: Create API URL
-const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
+    this.cityElement = document.getElementById("city");
+    this.tempElement = document.getElementById("temperature");
+    this.descElement = document.getElementById("description");
+    this.iconElement = document.getElementById("icon");
 
-// Step 4: Fetch weather data
-axios.get(url)
-.then(function(response) {
+    this.errorElement = document.getElementById("error");
+    this.loadingElement = document.getElementById("loading");
+    this.forecastContainer = document.getElementById("forecast-container");
 
-    // Step 5: Get data from response
-    const data = response.data;
+    this.searchBtn.addEventListener("click", this.handleSearch.bind(this));
+}
+WeatherApp.prototype.handleSearch = function () {
+    const city = this.cityInput.value.trim();
 
-    // Step 6: Update HTML elements
-    document.getElementById("city").textContent = data.name;
+    if (!city) {
+        this.errorElement.innerText = "Please enter a city name.";
+        return;
+    }
 
-    document.getElementById("temperature").textContent =
-        "Temperature: " + data.main.temp + "°C";
+    this.fetchWeatherData(city);
+};
 
-    document.getElementById("description").textContent =
-        data.weather[0].description;
+WeatherApp.prototype.fetchWeatherData = function (city) {
+    this.loadingElement.style.display = "block";
+    this.errorElement.innerText = "";
+    this.forecastContainer.innerHTML = "";
 
-    const iconCode = data.weather[0].icon;
+    const currentWeatherURL =
+        `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${this.apiKey}`;
 
-    document.getElementById("icon").src =
-        `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
-})
-.catch(function(error) {
-    console.log("Error:", error);
-});
+    const forecastURL =
+        `https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${this.apiKey}`;
+
+    Promise.all([
+        axios.get(currentWeatherURL),
+        axios.get(forecastURL)
+    ])
+    .then((responses) => {
+        const currentData = responses[0].data;
+        const forecastData = responses[1].data;
+
+        this.displayCurrentWeather(currentData);
+        this.displayForecast(forecastData);
+    })
+    .catch(() => {
+        this.errorElement.innerText = "City not found. Please try again.";
+    })
+    .finally(() => {
+        this.loadingElement.style.display = "none";
+    });
+};
+
+WeatherApp.prototype.displayCurrentWeather = function (data) {
+    this.cityElement.innerText = data.name;
+    this.tempElement.innerText = data.main.temp + "°C";
+    this.descElement.innerText =
+        data.weather[0].description.charAt(0).toUpperCase() +
+        data.weather[0].description.slice(1);
+
+    this.iconElement.src =
+        `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
+};
+
+WeatherApp.prototype.displayForecast = function (data) {
+    const dailyData = data.list.filter(item =>
+        item.dt_txt.includes("12:00:00")
+    );
+
+    dailyData.slice(0, 5).forEach(day => {
+        const date = new Date(day.dt_txt);
+        const dayName = date.toLocaleDateString("en-US", { weekday: "short" });
+
+        const card = document.createElement("div");
+        card.className = "forecast-card";
+
+        card.innerHTML = `
+            <h4>${dayName}</h4>
+            <img src="https://openweathermap.org/img/wn/${day.weather[0].icon}.png" />
+            <p>${day.main.temp}°C</p>
+            <p>${day.weather[0].description}</p>
+        `;
+
+        this.forecastContainer.appendChild(card);
+    });
+};
+
+const app = new WeatherApp("f05d8429dd24ad17444fb58b8877908c");

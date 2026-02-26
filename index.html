@@ -5,14 +5,23 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>SkyFetch Weather Dashboard</h1>
+   <div class="weather-card">
+    <h1>SkyFetch Weather</h1>
 
-    <div id="weather-container">
-        <h2 id="city"></h2>
-        <p id="temperature"></p>
-        <p id="description"></p>
-        <img id="icon" />
+    <div class="search-box">
+        <input type="text" id="cityInput" placeholder="Enter city name">
+        <button id="searchBtn">Search</button>
     </div>
+
+    <p id="loading" style="display:none;">Loading...</p>
+    <p id="error" style="color:red;"></p>
+
+    <h2 id="city"></h2>
+    <h3 id="temperature"></h3>
+    <p id="description"></p>
+    <img id="icon" />
+</div>
+    <div id="forecast-container" class="forecast-grid"></div>
 
     <!-- Axios Library -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
