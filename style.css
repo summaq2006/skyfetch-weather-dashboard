@@ -12,3 +12,21 @@ body {
     border-radius: 10px;
     display: inline-block;
 }
+
+.search-box {
+    margin-bottom: 15px;
+}
+
+input {
+    padding: 8px;
+    width: 65%;
+}
+
+button {
+    padding: 8px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #eee;
+}
