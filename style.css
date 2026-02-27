@@ -46,3 +46,9 @@ button:hover {
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     color: black;   /* ADD THIS */
 }
+
+#recent-buttons button {
+    margin: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+}

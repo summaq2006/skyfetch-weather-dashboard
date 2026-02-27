@@ -12,8 +12,10 @@ function WeatherApp(apiKey) {
     this.errorElement = document.getElementById("error");
     this.loadingElement = document.getElementById("loading");
     this.forecastContainer = document.getElementById("forecast-container");
-
+    this.recentButtonsContainer = document.getElementById("recent-buttons");
     this.searchBtn.addEventListener("click", this.handleSearch.bind(this));
+    this.loadLastCity();
+    this.loadRecentSearches();
 }
 WeatherApp.prototype.handleSearch = function () {
     const city = this.cityInput.value.trim();
@@ -47,6 +49,7 @@ WeatherApp.prototype.fetchWeatherData = function (city) {
 
         this.displayCurrentWeather(currentData);
         this.displayForecast(forecastData);
+        this.saveToLocalStorage(city);
     })
     .catch(() => {
         this.errorElement.innerText = "City not found. Please try again.";
@@ -87,6 +90,52 @@ WeatherApp.prototype.displayForecast = function (data) {
         `;
 
         this.forecastContainer.appendChild(card);
+    });
+};
+
+WeatherApp.prototype.saveToLocalStorage = function(city) {
+    localStorage.setItem("lastCity", city);
+
+    let recent = JSON.parse(localStorage.getItem("recentCities")) || [];
+
+    if (!recent.includes(city)) {
+        recent.unshift(city);
+
+        if (recent.length > 5) {
+            recent.pop();
+        }
+    }
+
+    localStorage.setItem("recentCities", JSON.stringify(recent));
+    this.renderRecentButtons();
+};
+
+WeatherApp.prototype.loadLastCity = function() {
+    const lastCity = localStorage.getItem("lastCity");
+
+    if (lastCity) {
+        this.fetchWeatherData(lastCity);
+    }
+};
+
+WeatherApp.prototype.loadRecentSearches = function() {
+    this.renderRecentButtons();
+};
+
+WeatherApp.prototype.renderRecentButtons = function() {
+    const recent = JSON.parse(localStorage.getItem("recentCities")) || [];
+
+    this.recentButtonsContainer.innerHTML = "";
+
+    recent.forEach(city => {
+        const btn = document.createElement("button");
+        btn.textContent = city;
+
+        btn.addEventListener("click", () => {
+            this.fetchWeatherData(city);
+        });
+
+        this.recentButtonsContainer.appendChild(btn);
     });
 };
 
